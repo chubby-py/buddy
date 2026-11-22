@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日衡好 Buddy - 國泰健康管理</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.92;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .breathing-orb {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeSlideUp 0.25s ease-out forwards;
+        }
+
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #227b54;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-[#f0f4f1] text-[#2c3e35] flex items-center justify-center min-h-screen p-0 sm:p-4 selection:bg-[#227b54] selection:text-white">
+
+    <!-- Mobile App Simulation Container (430px desktop frame / full responsive mobile) -->
+    <div class="w-full sm:max-w-[430px] h-[100dvh] sm:h-[880px] sm:max-h-[94dvh] bg-[#ffffff] sm:rounded-[40px] shadow-2xl flex flex-col overflow-hidden relative border border-[#d8e5de]">
+
+        <!-- Mobile Status Bar -->
+        <div class="bg-[#ffffff]/95 backdrop-blur-md pt-3 px-6 pb-2 flex justify-between items-center text-xs text-[#5c7a6b] font-medium select-none z-50 shrink-0">
+            <span id="current-time">09:41</span>
+            <div class="w-28 h-4 bg-[#e6ede9] rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2 hidden sm:block"></div>
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-signal text-[10px]"></i>
+                <i class="fa-solid fa-wifi text-[10px]"></i>
+                <i class="fa-solid fa-battery-full text-[#227b54]"></i>
+            </div>
+        </div>
+
+        <!-- Top Header Bar with Official Cathay Green & White Branding -->
+        <header class="bg-white/95 backdrop-blur-md px-5 py-3.5 border-b border-[#e2eae5] flex items-center justify-between z-40 shrink-0 shadow-sm">
+            <div class="flex items-center space-x-3 min-w-0">
+                <!-- Cathay Tree Logo Emblem -->
+                <div class="w-10 h-10 rounded-2xl bg-[#227b54] flex items-center justify-center text-white font-bold shadow-md shadow-[#227b54]/20 shrink-0">
+                    <i class="fa-solid fa-tree text-lg text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-base text-[#1b3026] tracking-tight flex items-center gap-1.5 truncate">
+                        <span class="truncate">每日衡好 Buddy</span>
+                        <span class="text-[10px] bg-[#e6f4ed] text-[#227b54] px-1.5 py-0.5 rounded-full font-semibold shrink-0">國泰健康</span>
+                    </h1>
+                    <p class="text-[11px] text-[#5c7a6b] truncate">Cathay Healthcare Management AI</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 shrink-0">
+                <button
+                    type="button"
+                    id="info-toggle-btn"
+                    onclick="toggleAboutTab()"
+                    class="w-9 h-9 rounded-xl bg-[#f0f4f1] hover:bg-[#e2eae5] active:scale-95 flex items-center justify-center text-[#227b54] transition shadow-sm"
+                    title="挑戰說明、AI 邊界與隱私透明度"
+                    aria-label="挑戰說明與免責聲明">
+                    <i class="fa-solid fa-circle-info text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content Viewport -->
+        <main id="main-viewport" class="flex-1 overflow-y-auto relative bg-[#f9fbfa]">
+
+            <!-- TAB 1: HOME (首頁) -->
+            <div id="tab-home" class="tab-content p-3 space-y-3 pb-24 animate-fade-up">
+
+                <!-- Daily Overview Card -->
+                <section class="rounded-3xl p-4 text-white shadow-md relative overflow-hidden bg-gradient-to-br from-[#227b54] to-[#164d37]">
+                    <div class="absolute -right-7 -top-8 w-32 h-32 rounded-full bg-white/10 pointer-events-none"></div>
+                    <div class="relative flex items-start justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] bg-white/20 px-2.5 py-1 rounded-full font-medium">今日健康積分</span>
+                            <div class="text-2xl font-extrabold mt-2 tracking-tight">
+                                <span id="home-total-kcal">1,019</span>
+                                <span class="text-sm font-medium text-emerald-100">/ <span id="home-target-kcal">1,800</span> kcal</span>
+                            </div>
+                            <div class="text-[11px] text-emerald-100 mt-1">
+                                已完成 <span id="home-progress-pct">57</span>% · 今日飲食進度
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-[11px] text-emerald-100">Buddy 等級</div>
+                            <div id="home-buddy-level" class="font-bold text-sm mt-1">
+                                <i class="fa-solid fa-shield-heart text-amber-300 mr-1"></i>Lv.3 衡好萌獸
+                            </div>
+                            <div class="text-[10px] text-emerald-200 mt-1">EXP: <span id="home-buddy-exp">240</span> / 300</div>
+                        </div>
+                    </div>
+                    <div class="w-full bg-black/20 h-2 rounded-full mt-3 overflow-hidden">
+                        <div id="home-progress-bar" class="bg-amber-300 h-full rounded-full transition-all duration-500" style="width: 57%;"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-emerald-100 mt-1.5">
+                        <span>今日累積熱量</span>
+                        <span>剩餘 <strong id="home-remaining-kcal" class="text-white">781</strong> kcal</span>
+                    </div>
+                </section>
+
+                <!-- Emergency SOS Card -->
+                <section class="rounded-3xl p-3.5 bg-gradient-to-r from-rose-600 to-red-700 text-white shadow-md border border-rose-300">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                            </span>
+                            <div>
+                                <h2 class="font-extrabold text-sm">緊急救護 SOS</h2>
+                                <p class="text-[10px] text-rose-100">需要協助時，快速撥打緊急電話</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-white/20 rounded-full px-2 py-1 font-medium shrink-0">快速求救</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button
+                            type="button"
+                            onclick="triggerEmergencySOS('110')"
+                            class="bg-white hover:bg-rose-50 text-rose-700 font-extrabold rounded-xl py-3 text-xs shadow-sm active:scale-95 transition">
+                            <i class="fa-solid fa-phone-volume mr-1"></i>撥打 110 報警
+                        </button>
+                        <button
+                            type="button"
+                            onclick="triggerEmergencySOS('119')"
+                            class="bg-[#7f1725] hover:bg-[#69121e] text-white border border-white/30 font-extrabold rounded-xl py-3 text-xs shadow-sm active:scale-95 transition">
+                            <i class="fa-solid fa-truck-medical mr-1"></i>撥打 119 救護
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Buddy Pet & Food Camera 2-Column Row -->
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Buddy Pet Card -->
+                    <section class="rounded-3xl p-3 bg-[#e8f5ed] border border-[#cfe6d8] shadow-sm flex flex-col items-center text-center min-w-0 justify-between">
+                        <div class="w-full flex justify-between items-center text-[10px] text-[#227b54] font-bold">
+                            <span><i class="fa-solid fa-heart text-rose-500 mr-1"></i>Buddy</span>
+                            <span>連續 <span id="buddy-streak">3</span> 天</span>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="interactWithBuddy()"
+                            class="w-20 h-20 rounded-full bg-white border-2 border-[#b8dbc7] flex items-center justify-center text-4xl my-2 shadow-inner breathing-orb active:scale-90 transition cursor-pointer"
+                            title="點擊互動安撫 Buddy">
+                            <span id="buddy-emoji">🐸💚</span>
+                        </button>
+                        <div>
+                            <div id="buddy-mood" class="text-xs font-bold text-[#1b3026]">心情：開心</div>
+                            <p id="buddy-quote" class="text-[10px] text-[#5c7a6b] mt-1 leading-relaxed">今天也一起照顧健康吧！</p>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="interactWithBuddy()"
+                            class="w-full mt-2 bg-white hover:bg-emerald-50 text-[#227b54] border border-[#b8dbc7] rounded-xl py-1.5 text-[11px] font-bold transition active:scale-95">
+                            <i class="fa-solid fa-hand-holding-heart mr-1"></i>互動鼓勵
+                        </button>
+                    </section>
+
+                    <!-- Food AI Camera Card -->
+                    <section class="rounded-3xl p-3 bg-[#fff4df] border border-[#f1dfbd] shadow-sm flex flex-col items-center text-center min-w-0 justify-between">
+                        <div class="w-full flex items-center justify-between text-[10px] font-bold text-amber-800">
+                            <span><i class="fa-solid fa-camera mr-1"></i>飲食 AI 辨識</span>
+                            <span class="bg-amber-200/80 text-amber-900 px-1.5 py-0.5 rounded-full text-[9px]">+20 幣</span>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-2xl text-amber-600 my-1.5 shadow-sm">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#5b4525]">拍照記錄餐點</div>
+                            <p class="text-[10px] text-amber-800/80 mt-0.5">分析熱量與營養素</p>
+                        </div>
+                        <div class="w-full space-y-1.5 mt-2">
+                            <label
+                                for="food-camera-input"
+                                class="cursor-pointer w-full bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-xl py-2 text-xs font-bold block transition">
+                                <i class="fa-solid fa-camera mr-1"></i>立即拍照
+                            </label>
+                            <input
+                                type="file"
+                                id="food-camera-input"
+                                accept="image/*"
+                                capture="environment"
+                                class="hidden"
+                                onchange="handleFoodPhoto(event)">
+                            <button
+                                type="button"
+                                onclick="simulateSampleMeal()"
+                                class="w-full bg-white/90 hover:bg-white text-amber-800 border border-amber-300 active:scale-95 rounded-xl py-1.5 text-[10px] font-bold transition">
+                                <i class="fa-solid fa-bolt mr-1"></i>快速示範辨識餐點
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Meal Breakdown Card -->
+                <section class="rounded-3xl p-4 bg-white border border-[#e2eae5] shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-sm text-[#1b3026]">
+                            <i class="fa-solid fa-bowl-food text-[#227b54] mr-1.5"></i>今日各餐熱量
+                        </h3>
+                        <button
+                            type="button"
+                            onclick="switchTab('diary')"
+                            class="text-[10px] text-[#227b54] hover:underline font-semibold cursor-pointer">
+                            查看日誌 <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 text-center">
+                        <div class="rounded-xl bg-[#f0f4f1] p-2">
+                            <div class="text-[10px] text-[#5c7a6b]">早餐</div>
+                            <div id="meal-breakfast-kcal" class="font-extrabold text-sm mt-1 text-[#1b3026]">150</div>
+                            <div class="text-[9px] text-[#5c7a6b]">kcal</div>
+                        </div>
+                        <div class="rounded-xl bg-[#f0f4f1] p-2">
+                            <div class="text-[10px] text-[#5c7a6b]">午餐</div>
+                            <div id="meal-lunch-kcal" class="font-extrabold text-sm mt-1 text-[#1b3026]">686</div>
+                            <div class="text-[9px] text-[#5c7a6b]">kcal</div>
+                        </div>
+                        <div class="rounded-xl bg-[#f0f4f1] p-2">
+                            <div class="text-[10px] text-[#5c7a6b]">晚餐</div>
+                            <div id="meal-dinner-kcal" class="font-extrabold text-sm mt-1 text-[#1b3026]">0</div>
+                            <div class="text-[9px] text-[#5c7a6b]">kcal</div>
+                        </div>
+                        <div class="rounded-xl bg-[#f0f4f1] p-2">
+                            <div class="text-[10px] text-[#5c7a6b]">點心</div>
+                            <div id="meal-snack-kcal" class="font-extrabold text-sm mt-1 text-[#1b3026]">183</div>
+                            <div class="text-[9px] text-[#5c7a6b]">kcal</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Health Alarm Card -->
+                <section class="rounded-3xl p-4 bg-[#eaf2ff] border border-[#d4e2fb] shadow-sm">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <h3 class="font-bold text-sm text-blue-900">
+                            <i class="fa-solid fa-clock mr-1.5"></i>健康專屬鬧鐘
+                        </h3>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">推播已啟用</span>
+                    </div>
+                    <p class="text-[10px] text-blue-900/70 mb-3">提醒三餐、飲水與放鬆練習（點擊可切換開關）</p>
+                    <div id="alarm-list" class="grid grid-cols-3 gap-2 text-center">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                    <button
+                        type="button"
+                        onclick="openAddAlarmModal()"
+                        class="w-full mt-3 bg-white hover:bg-blue-50 active:scale-98 text-blue-800 border border-blue-200 font-bold rounded-xl py-2.5 text-xs transition">
+                        <i class="fa-solid fa-plus mr-1"></i>新增自訂健康鬧鐘
+                    </button>
+                </section>
+
+                <!-- Rewards & Coins Card -->
+                <section class="rounded-3xl p-4 bg-[#fff8df] border border-[#f0e5b8] shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-sm text-amber-950">
+                            <i class="fa-solid fa-coins text-amber-600 mr-1.5"></i>衡好幣與獎勵
+                        </h3>
+                        <span class="rounded-full bg-amber-200 text-amber-900 px-2.5 py-1 text-[11px] font-extrabold">
+                            <span id="home-coins-count">380</span> 幣
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-amber-900/75 mt-2">
+                        透過健康打卡、步數與飲食紀錄累積衡好幣，可兌換健康好禮。
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <button
+                            type="button"
+                            onclick="showRewardDetail('insurance')"
+                            class="bg-white/85 hover:bg-white rounded-xl p-2.5 text-center transition border border-amber-200/60">
+                            <i class="fa-solid fa-shield-halved text-amber-700"></i>
+                            <div class="text-[11px] font-bold text-amber-950 mt-1">保費折抵資訊</div>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="showRewardDetail('checkup')"
+                            class="bg-white/85 hover:bg-white rounded-xl p-2.5 text-center transition border border-amber-200/60">
+                            <i class="fa-solid fa-hospital-user text-amber-700"></i>
+                            <div class="text-[11px] font-bold text-amber-950 mt-1">健檢折價券</div>
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="redeemCoins()"
+                        class="w-full mt-3 bg-amber-600 hover:bg-amber-700 active:scale-98 text-white font-bold rounded-xl py-2.5 text-xs transition">
+                        查看衡好幣兌換專區
+                    </button>
+                </section>
+
+                <!-- Wearable Device Card -->
+                <section class="rounded-3xl p-4 bg-[#f0eaff] border border-[#ded2f5] shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-sm text-violet-950">
+                            <i class="fa-solid fa-watch-smart mr-1.5"></i>智慧穿戴裝置
+                        </h3>
+                        <span id="wearable-status-badge" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full font-semibold">
+                            <i class="fa-solid fa-circle text-[7px] mr-1"></i>已連線
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-violet-900/70 mt-1 mb-3">同步心跳、血氧與活動數據</p>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-white/80 rounded-xl p-2">
+                            <div class="text-[10px] text-violet-800">心跳</div>
+                            <div id="wearable-hr" class="font-extrabold text-sm text-violet-950">72 <span class="text-[9px] font-normal">bpm</span></div>
+                        </div>
+                        <div class="bg-white/80 rounded-xl p-2">
+                            <div class="text-[10px] text-violet-800">血氧</div>
+                            <div id="wearable-spo2" class="font-extrabold text-sm text-violet-950">98%</div>
+                        </div>
+                        <div class="bg-white/80 rounded-xl p-2">
+                            <div class="text-[10px] text-violet-800">步數</div>
+                            <div id="wearable-steps" class="font-extrabold text-sm text-violet-950">6,842</div>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="connectWearableDevice()"
+                        class="w-full mt-3 bg-white hover:bg-violet-50 active:scale-98 text-violet-900 border border-violet-200 font-bold rounded-xl py-2.5 text-xs transition">
+                        <i class="fa-brands fa-bluetooth-b mr-1"></i>重新掃描／配對裝置
+                    </button>
+                </section>
+
+                <!-- Prototype Disclaimer Note -->
+                <p class="text-[10px] text-[#789084] text-center px-2 leading-relaxed">
+                    提醒：目前為互動展示原型，穿戴數據、推播及 SOS 自動偵測尚未連接實際服務。緊急情況請直接使用手機撥打緊急電話。
+                </p>
+            </div>
+
+            <!-- TAB 2: EXPLORE (AI 顧問) -->
+            <div id="tab-explore" class="tab-content hidden p-4 space-y-4 pb-24 animate-fade-up">
+                <!-- AI Chatroom Header -->
+                <div class="bg-white rounded-3xl p-4 border border-[#e2eae5] shadow-sm flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-[#227b54] flex items-center justify-center text-white font-bold shadow-md shrink-0">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-[#1b3026]">衡好 Buddy AI 健康顧問</h3>
+                            <p class="text-[11px] text-[#227b54] flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 專家聯名研發線上諮詢中
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="clearChat()"
+                        class="text-xs text-[#5c7a6b] hover:text-[#227b54] px-2.5 py-1.5 rounded-lg border border-[#e2eae5] transition">
+                        清除對話
+                    </button>
+                </div>
+
+                <!-- Proactive AI Q&A Suggestions -->
+                <div class="bg-[#f0f4f1] p-3 rounded-2xl border border-[#e2eae5] space-y-2">
+                    <div class="text-[11px] font-bold text-[#227b54] flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 主動健康關懷與問答推薦
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button
+                            type="button"
+                            onclick="sendPresetPrompt('我最近常覺得疲倦，該怎麼調整飲食與睡眠？')"
+                            class="bg-white hover:bg-emerald-50 text-[#1b3026] px-2.5 py-1.5 rounded-xl text-[11px] border border-[#d8e5de] transition text-left">
+                            ⚡ 我最近常覺得疲倦怎麼辦？
+                        </button>
+                        <button
+                            type="button"
+                            onclick="sendPresetPrompt('如何解讀我的健檢紅字與膽固醇指數？')"
+                            class="bg-white hover:bg-emerald-50 text-[#1b3026] px-2.5 py-1.5 rounded-xl text-[11px] border border-[#d8e5de] transition text-left">
+                            🩺 如何解讀健檢紅字？
+                        </button>
+                        <button
+                            type="button"
+                            onclick="sendPresetPrompt('今天晚餐推薦吃什麼才能維持健康體態？')"
+                            class="bg-white hover:bg-emerald-50 text-[#1b3026] px-2.5 py-1.5 rounded-xl text-[11px] border border-[#d8e5de] transition text-left">
+                            🥗 今晚健康晚餐推薦
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Message Stream -->
+                <div id="chat-messages" class="space-y-3 min-h-[220px] max-h-[300px] overflow-y-auto pr-1">
+                    <div class="flex items-start space-x-2">
+                        <div class="w-7 h-7 rounded-full bg-[#227b54] text-white flex items-center justify-center text-xs shrink-0 mt-1">AI</div>
+                        <div class="bg-white p-3.5 rounded-2xl rounded-tl-sm text-xs text-[#1b3026] shadow-sm border border-[#e2eae5] max-w-[82%] leading-relaxed">
+                            您好！我是您的專屬健康管理 Buddy。今天身體感覺怎麼樣呢？您可以透過下方語音輸入或文字問我任何健康疑問喔！
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Form with Voice Speech-to-Text Simulation Button -->
+                <div class="flex items-center space-x-2 bg-white p-2 rounded-2xl border border-[#e2eae5] shadow-sm">
+                    <button
+                        type="button"
+                        id="voice-btn"
+                        onclick="toggleVoiceInput()"
+                        class="w-9 h-9 rounded-xl bg-[#f0f4f1] hover:bg-[#e2eae5] text-[#227b54] flex items-center justify-center transition shadow-sm shrink-0"
+                        title="語音輸入">
+                        <i class="fa-solid fa-microphone text-xs" id="mic-icon"></i>
+                    </button>
+                    <input
+                        type="text"
+                        id="chat-input"
+                        placeholder="輸入或使用語音提問..."
+                        class="flex-1 bg-transparent px-2 py-2 text-xs text-[#1b3026] focus:outline-none placeholder:text-[#5c7a6b] min-w-0"
+                        onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <button
+                        type="button"
+                        onclick="sendChatMessage()"
+                        class="bg-[#227b54] hover:bg-[#1b6444] text-white w-9 h-9 rounded-xl flex items-center justify-center transition shadow-sm shrink-0"
+                        aria-label="送出訊息">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Interactive Breathing Companion Card -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm text-center space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-sm text-[#1b3026] flex items-center gap-1.5">
+                            <i class="fa-solid fa-lungs text-[#227b54]"></i> 沉浸式呼吸放鬆引導
+                        </h3>
+                        <span class="text-[11px] bg-[#e6f4ed] text-[#227b54] px-2 py-0.5 rounded-full font-medium">心靈舒壓</span>
+                    </div>
+
+                    <div class="my-4 relative flex items-center justify-center">
+                        <div
+                            id="breathing-circle"
+                            class="w-28 h-28 rounded-full bg-[#e6f4ed] border-4 border-[#227b54] flex items-center justify-center text-xs font-bold text-[#227b54] shadow-inner transition-transform duration-1000 breathing-orb px-2">
+                            <span id="breathing-text">點擊開始</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-2">
+                        <button
+                            type="button"
+                            onclick="toggleBreathing(true)"
+                            class="bg-[#227b54] hover:bg-[#1b6444] text-white px-4 py-2 rounded-xl text-xs font-semibold transition shadow-sm">
+                            開始呼吸練習
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleBreathing(false)"
+                            class="bg-[#f0f4f1] hover:bg-[#e2eae5] text-[#5c7a6b] px-4 py-2 rounded-xl text-xs font-semibold transition border border-[#e2eae5]">
+                            停止
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DIARY (日誌) -->
+            <div id="tab-diary" class="tab-content hidden p-4 space-y-4 pb-24 animate-fade-up">
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3">
+                    <div class="flex justify-between items-center gap-2">
+                        <h3 class="font-bold text-sm text-[#1b3026] flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-medical text-[#227b54]"></i> 飲食與健康日誌牆
+                        </h3>
+                        <button
+                            type="button"
+                            onclick="exportData()"
+                            class="bg-[#e6f4ed] hover:bg-[#d4ebd9] text-[#227b54] px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0">
+                            <i class="fa-solid fa-file-arrow-down mr-1"></i> 匯出報表
+                        </button>
+                    </div>
+                    <p class="text-xs text-[#5c7a6b] leading-relaxed">
+                        系統自動記錄您上傳的每筆飲食與健康檢測數據，支援一鍵匯出供營養師或醫師參考。
+                    </p>
+
+                    <!-- Social Sharing Check-in Button -->
+                    <div class="pt-1">
+                        <button
+                            type="button"
+                            onclick="shareCheckIn()"
+                            class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-2xl text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-98">
+                            <i class="fa-solid fa-share-nodes text-sm"></i> 分享今日健康打卡 (我在衡好 Buddy 獲得 95 分！)
+                        </button>
+                    </div>
+
+                    <!-- Log Items Container -->
+                    <div class="space-y-2.5 pt-2" id="log-items-container">
+                        <div class="bg-[#f0f4f1] p-3.5 rounded-2xl flex items-center justify-between border border-[#e2eae5] gap-2">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-[#227b54]/10 text-[#227b54] flex items-center justify-center font-bold text-sm shrink-0">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-[#1b3026] truncate">午餐：糙米飯佐烤雞胸肉</h4>
+                                    <span class="text-[10px] text-[#5c7a6b]">今天 12:15 · 486 kcal · 蛋白質 32g</span>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-[#e6f4ed] text-[#227b54] px-2 py-1 rounded-lg font-semibold shrink-0">AI 已解析</span>
+                        </div>
+
+                        <div class="bg-[#f0f4f1] p-3.5 rounded-2xl flex items-center justify-between border border-[#e2eae5] gap-2">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-[#227b54]/10 text-[#227b54] flex items-center justify-center font-bold text-sm shrink-0">
+                                    <i class="fa-solid fa-apple-whole"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-[#1b3026] truncate">下午茶：新鮮蘋果與堅果</h4>
+                                    <span class="text-[10px] text-[#5c7a6b]">今天 15:30 · 183 kcal · 維生素C</span>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-[#e6f4ed] text-[#227b54] px-2 py-1 rounded-lg font-semibold shrink-0">AI 已解析</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gamified Badge Achievement Card -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm text-[#1b3026] flex items-center gap-1.5">
+                        <i class="fa-solid fa-award text-amber-500"></i> 健康成就徽章牆
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <div class="bg-[#f0f4f1] p-3 rounded-2xl text-center border border-[#227b54]/30 shadow-sm">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs font-bold text-[#1b3026]">連續打卡 3 天</div>
+                            <div class="text-[9px] text-[#227b54] font-semibold mt-1">已解鎖</div>
+                        </div>
+                        <div id="badge-nutrition" class="bg-[#f0f4f1] p-3 rounded-2xl text-center border border-[#e2eae5] opacity-75">
+                            <div class="text-2xl mb-1">🥗</div>
+                            <div class="text-xs font-bold text-[#1b3026]">完美營養比例</div>
+                            <div id="badge-nutrition-status" class="text-[9px] text-[#5c7a6b] mt-1">進行中 (3/5)</div>
+                        </div>
+                        <div class="bg-[#f0f4f1] p-3 rounded-2xl text-center border border-[#e2eae5] opacity-75">
+                            <div class="text-2xl mb-1">💧</div>
+                            <div class="text-xs font-bold text-[#1b3026]">水分達人</div>
+                            <div class="text-[9px] text-[#5c7a6b] mt-1">未解鎖</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PERSONAL (據點 - 國泰健康管理與診所據點) -->
+            <div id="tab-personal" class="tab-content hidden p-4 space-y-4 pb-24 animate-fade-up">
+                <!-- Company Profile Card -->
+                <div class="bg-gradient-to-br from-[#227b54] to-[#185e3f] rounded-3xl p-5 text-white shadow-lg space-y-3 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-2xl bg-white text-[#227b54] flex items-center justify-center font-bold shadow-md shrink-0">
+                            <i class="fa-solid fa-tree text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base">國泰健康管理顧問股份有限公司</h3>
+                            <p class="text-xs text-[#cde7d9]">Cathay Healthcare Management</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-[#e6f4ed] leading-relaxed pt-1">
+                        結合專家研發與 AI 科技，從健檢數據開始串聯用戶旅程的健康管理服務，榮獲《哈佛商業評論》數位轉型鼎革獎。
+                    </p>
+                </div>
+
+                <!-- Clinic Locations -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm text-[#1b3026] flex items-center gap-1.5">
+                        <i class="fa-solid fa-hospital text-[#227b54]"></i> 健檢中心與診所據點
+                    </h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-3 bg-[#f0f4f1] rounded-2xl border border-[#e2eae5] flex justify-between items-center gap-2">
+                            <div>
+                                <span class="font-bold text-[#1b3026]">敦南 / 敦平 / 敦御診所</span>
+                                <p class="text-[11px] text-[#5c7a6b] mt-0.5">台北市大安區敦化南路二段</p>
+                            </div>
+                            <a href="https://www.cathay-hcm.com.tw/tw/front" target="_blank" rel="noopener noreferrer" class="bg-[#227b54] text-white px-3 py-1.5 rounded-xl font-semibold hover:bg-[#1b6444] transition shrink-0">預約</a>
+                        </div>
+                        <div class="p-3 bg-[#f0f4f1] rounded-2xl border border-[#e2eae5] flex justify-between items-center gap-2">
+                            <div>
+                                <span class="font-bold text-[#1b3026]">瑞成 / 瑞健 / 瑞宏診所</span>
+                                <p class="text-[11px] text-[#5c7a6b] mt-0.5">台北市內湖區瑞光路</p>
+                            </div>
+                            <a href="https://www.cathay-hcm.com.tw/tw/front" target="_blank" rel="noopener noreferrer" class="bg-[#227b54] text-white px-3 py-1.5 rounded-xl font-semibold hover:bg-[#1b6444] transition shrink-0">預約</a>
+                        </div>
+                        <div class="p-3 bg-[#f0f4f1] rounded-2xl border border-[#e2eae5] flex justify-between items-center gap-2">
+                            <div>
+                                <span class="font-bold text-[#1b3026]">民安 / 泰安 / 國泰功診所</span>
+                                <p class="text-[11px] text-[#5c7a6b] mt-0.5">新竹市 / 台南市</p>
+                            </div>
+                            <a href="https://www.cathay-hcm.com.tw/tw/front" target="_blank" rel="noopener noreferrer" class="bg-[#227b54] text-white px-3 py-1.5 rounded-xl font-semibold hover:bg-[#1b6444] transition shrink-0">預約</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Service & Official Links -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm text-[#1b3026] flex items-center gap-1.5">
+                        <i class="fa-solid fa-headset text-[#227b54]"></i> 客服與官方連結
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <a href="https://www.cathay-hcm.com.tw/tw/front" target="_blank" rel="noopener noreferrer" class="p-3 bg-[#f0f4f1] hover:bg-[#e2eae5] rounded-2xl text-center border border-[#e2eae5] transition block">
+                            <i class="fa-solid fa-globe text-[#227b54] text-base mb-1 block"></i>
+                            <span class="font-bold text-[#1b3026]">官方網站</span>
+                        </a>
+                        <a href="https://page.line.me/jpc9732u" target="_blank" rel="noopener noreferrer" class="p-3 bg-[#f0f4f1] hover:bg-[#e2eae5] rounded-2xl text-center border border-[#e2eae5] transition block">
+                            <i class="fa-brands fa-line text-emerald-600 text-base mb-1 block"></i>
+                            <span class="font-bold text-[#1b3026]">LINE 官方帳號</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: ABOUT / CHALLENGE & AI TRANSPARENCY (挑戰說明與 AI 邊界聲明) -->
+            <div id="tab-about" class="tab-content hidden p-4 space-y-3.5 pb-24 animate-fade-up">
+                <!-- Card 1: AI Boundary, Disclaimer & Privacy Transparency -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center space-x-2 text-[#227b54]">
+                            <span class="w-8 h-8 rounded-xl bg-[#e6f4ed] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-shield-halved text-sm"></i>
+                            </span>
+                            <div>
+                                <h3 class="font-bold text-sm text-[#1b3026]">AI 邊界、免責聲明與隱私透明度</h3>
+                                <p class="text-[10px] text-[#5c7a6b]">使用前請了解服務定位與資料運用方式</p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="toggleAboutTab()"
+                            class="text-xs text-[#227b54] font-semibold hover:underline shrink-0">
+                            返回原頁
+                        </button>
+                    </div>
+
+                    <!-- Sub-block 1: Medical & AI Boundary -->
+                    <div class="rounded-2xl bg-[#f4faf6] border border-[#d6eadf] p-3.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-[#1b3026] flex items-center gap-1.5">
+                                <i class="fa-solid fa-user-doctor text-[#227b54]"></i> 醫療與 AI 服務邊界
+                            </span>
+                            <span class="text-[10px] bg-[#e6f4ed] text-[#227b54] px-2 py-0.5 rounded-full font-semibold">非醫療診斷</span>
+                        </div>
+                        <ul class="text-[11px] text-[#3a5246] space-y-1.5 leading-relaxed list-disc pl-4">
+                            <li>「每日衡好 Buddy」定位為<strong>日常健康管理與 AI 輔助參考</strong>，不取代醫師診斷、處方或專業醫療評估。</li>
+                            <li>AI 營養辨識與健康建議僅供生活習慣調整參考，若有長期不適請諮詢專業醫療人員。</li>
+                        </ul>
+                        <div class="rounded-xl bg-rose-50 border border-rose-200 p-2.5 text-[11px] text-rose-800 leading-relaxed flex items-start gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600 mt-0.5 shrink-0"></i>
+                            <span>
+                                <strong>緊急狀況提醒：</strong>若出現胸悶、劇痛、呼吸困難或意識不清等危急狀況，請立即撥打 <strong>119 救護</strong>、<strong>110 報警</strong>，或前往就近醫療院所。
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sub-block 2: Collapsible Data & Privacy Transparency -->
+                    <div class="rounded-2xl bg-[#f9fbfa] border border-[#e2eae5] overflow-hidden">
+                        <button
+                            type="button"
+                            onclick="togglePrivacyDetails()"
+                            class="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#f0f4f1] transition">
+                            <span class="text-xs font-bold text-[#1b3026] flex items-center gap-1.5">
+                                <i class="fa-solid fa-lock text-[#227b54]"></i> 資料用途與隱私透明度說明
+                            </span>
+                            <span class="text-[11px] text-[#227b54] font-semibold flex items-center gap-1">
+                                <span id="privacy-toggle-label">收合</span>
+                                <i id="privacy-toggle-icon" class="fa-solid fa-chevron-up text-[10px] transition-transform"></i>
+                            </span>
+                        </button>
+                        <div id="privacy-details-body" class="px-3.5 pb-3.5 pt-1 space-y-2 border-t border-[#e2eae5]/70">
+                            <ul class="text-[11px] text-[#4c6659] space-y-1.5 leading-relaxed list-disc pl-4">
+                                <li><strong>資料使用目的：</strong>飲食照片、穿戴指標（心跳、血氧、步數）與 AI 對話紀錄，僅用於日常狀態追蹤、健康提醒與個人化建議生成。</li>
+                                <li><strong>互動原型聲明：</strong>目前為互動展示原型階段，所有數據、推播與裝置連線狀態皆為模擬資料，未實際上傳或撥號。</li>
+                                <li><strong>未來授權管理：</strong>正式版將提供「資料授權管理中心」，使用者可隨時檢視、匯出或撤回各項健康數據同步權限。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Acknowledge Action Bar -->
+                    <div class="pt-0.5 flex items-center justify-between gap-2">
+                        <span id="disclaimer-ack-status" class="text-[11px] text-[#5c7a6b] flex items-center gap-1">
+                            <i class="fa-regular fa-circle-check text-[#227b54]"></i> 再次點擊右上角 ⓘ 可返回原頁面
+                        </span>
+                        <button
+                            type="button"
+                            id="disclaimer-ack-btn"
+                            onclick="acknowledgeDisclaimer()"
+                            class="bg-[#227b54] hover:bg-[#1b6444] active:scale-95 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm shrink-0">
+                            我已了解
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Enterprise Challenge Info -->
+                <div class="bg-white rounded-3xl p-5 border border-[#e2eae5] shadow-sm space-y-3">
+                    <div class="flex items-center space-x-2 text-[#227b54]">
+                        <i class="fa-solid fa-lightbulb text-lg"></i>
+                        <h3 class="font-bold text-base text-[#1b3026]">AI 企業創新實戰營 挑戰簡介</h3>
+                    </div>
+                    <div class="bg-[#e6f4ed] p-3 rounded-2xl text-xs text-[#227b54] font-semibold">
+                        挑戰名稱：從好產品到好生意，每日衡好 Buddy 成長挑戰
+                    </div>
+                    <p class="text-xs text-[#5c7a6b] leading-relaxed">
+                        想像一下，今天你覺得身體怪怪的，想知道自己到底怎麼了。你可以上網 Google、問 ChatGPT，也可以去診所諮詢醫師，還有「Buddy」可以選擇！但問題來了：這麼多選擇，你為什麼要選 Buddy？它又有什麼魅力，讓你願意掏錢課金？
+                    </p>
+                    <div class="border-t border-[#e2eae5] pt-3 space-y-2 text-xs text-[#5c7a6b]">
+                        <div class="font-bold text-[#1b3026]">首要業務目標 (1-3年)：</div>
+                        <p class="leading-relaxed">
+                            如何透過「每日衡好 Buddy」的產品差異化，讓使用者願意優先選擇並付費？逐步建立 AI 直接變現模式，形成可規模化且能持續獲利的營運機制。
+                        </p>
+                        <div class="font-bold text-[#1b3026] pt-1">指導單位與主辦：</div>
+                        <p class="leading-relaxed">
+                            數位發展部數位產業署指導，TCA 台北市電腦公會執行，UNEXT × Onboard 辦理。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#e2eae5] px-4 py-2 flex justify-between items-center z-40 shadow-lg">
+            <button type="button" onclick="switchTab('home')" class="nav-btn flex flex-col items-center flex-1 py-1 text-[#227b54] transition" data-target="home">
+                <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold">首頁</span>
+            </button>
+            <button type="button" onclick="switchTab('explore')" class="nav-btn flex flex-col items-center flex-1 py-1 text-[#5c7a6b] hover:text-[#227b54] transition" data-target="explore">
+                <i class="fa-solid fa-comments text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">AI 顧問</span>
+            </button>
+            <button type="button" onclick="switchTab('diary')" class="nav-btn flex flex-col items-center flex-1 py-1 text-[#5c7a6b] hover:text-[#227b54] transition" data-target="diary">
+                <i class="fa-solid fa-book-open text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">日誌</span>
+            </button>
+            <button type="button" onclick="switchTab('personal')" class="nav-btn flex flex-col items-center flex-1 py-1 text-[#5c7a6b] hover:text-[#227b54] transition" data-target="personal">
+                <i class="fa-solid fa-user-shield text-lg mb-0.5"></i>
+                <span class="text-[10px] font-medium">據點</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Add Custom Alarm Modal -->
+    <div id="alarm-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 border border-[#e2eae5]">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-[#1b3026]">
+                    <i class="fa-solid fa-clock text-[#227b54] mr-1.5"></i>新增自訂健康鬧鐘
+                </h3>
+                <button type="button" onclick="closeAlarmModal()" class="text-[#5c7a6b] hover:text-[#1b3026] p-1" aria-label="關閉">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-left">
+                <div>
+                    <label for="alarm-label-input" class="block text-xs font-semibold text-[#1b3026] mb-1">提醒項目名稱</label>
+                    <input
+                        type="text"
+                        id="alarm-label-input"
+                        placeholder="例如：下午補水、量血壓、伸展運動"
+                        class="w-full rounded-xl border border-[#d8e5de] bg-[#f9fbfa] px-3 py-2.5 text-xs text-[#1b3026] focus:outline-none focus:border-[#227b54]">
+                </div>
+                <div>
+                    <label for="alarm-time-input" class="block text-xs font-semibold text-[#1b3026] mb-1">提醒時間</label>
+                    <input
+                        type="time"
+                        id="alarm-time-input"
+                        value="16:00"
+                        class="w-full rounded-xl border border-[#d8e5de] bg-[#f9fbfa] px-3 py-2.5 text-xs text-[#1b3026] focus:outline-none focus:border-[#227b54]">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button
+                    type="button"
+                    onclick="closeAlarmModal()"
+                    class="w-full bg-[#f0f4f1] hover:bg-[#e2eae5] text-[#5c7a6b] font-bold py-2.5 rounded-2xl text-xs transition">
+                    取消
+                </button>
+                <button
+                    type="button"
+                    onclick="saveCustomAlarm()"
+                    class="w-full bg-[#227b54] hover:bg-[#1b6444] text-white font-bold py-2.5 rounded-2xl text-xs transition shadow-sm">
+                    儲存鬧鐘
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Message Box / Notification Modal -->
+    <div id="modal-box" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 border border-[#e2eae5] text-center">
+            <div id="modal-icon" class="w-14 h-14 rounded-full bg-[#e6f4ed] text-[#227b54] flex items-center justify-center text-2xl mx-auto shadow-inner">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 id="modal-title" class="font-bold text-lg text-[#1b3026]">提示訊息</h3>
+            <p id="modal-desc" class="text-xs text-[#5c7a6b] leading-relaxed">內容訊息...</p>
+            <button
+                type="button"
+                onclick="closeModal()"
+                class="w-full bg-[#227b54] hover:bg-[#1b6444] text-white font-bold py-3 rounded-2xl transition shadow-md text-sm">
+                確定
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Application State
+        const appState = {
+            targetKcal: 1800,
+            meals: {
+                breakfast: 150,
+                lunch: 686,
+                dinner: 0,
+                snack: 183
+            },
+            coins: 380,
+            buddyExp: 240,
+            buddyStreak: 3,
+            nutritionCount: 3,
+            alarms: [
+                { id: 1, label: '早餐', time: '08:00', enabled: true },
+                { id: 2, label: '午餐', time: '12:30', enabled: true },
+                { id: 3, label: '放鬆', time: '20:00', enabled: true }
+            ],
+            wearable: {
+                hr: 72,
+                spo2: 98,
+                steps: 6842,
+                connected: true
+            }
+        };
+
+        // Live Status Bar Clock
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeEl = document.getElementById('current-time');
+            if (timeEl) timeEl.innerText = `${hours}:${minutes}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Tab Switching & Info Panel Toggle Logic
+        let previousTab = 'home';
+
+        function toggleAboutTab() {
+            const aboutTab = document.getElementById('tab-about');
+            const isAboutVisible = aboutTab && !aboutTab.classList.contains('hidden');
+
+            if (isAboutVisible) {
+                switchTab(previousTab || 'home');
+            } else {
+                switchTab('about');
+            }
+        }
+
+        function switchTab(tabId) {
+            const currentVisibleTab = Array.from(document.querySelectorAll('.tab-content'))
+                .find(el => !el.classList.contains('hidden'));
+
+            if (tabId === 'about' && currentVisibleTab && currentVisibleTab.id !== 'tab-about') {
+                previousTab = currentVisibleTab.id.replace('tab-', '');
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+            }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-[#227b54]');
+                btn.classList.add('text-[#5c7a6b]');
+                const span = btn.querySelector('span');
+                if (span) {
+                    span.classList.remove('font-semibold');
+                    span.classList.add('font-medium');
+                }
+            });
+
+            const activeBtn = document.querySelector(`.nav-btn[data-target="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-[#5c7a6b]');
+                activeBtn.classList.add('text-[#227b54]');
+                const span = activeBtn.querySelector('span');
+                if (span) {
+                    span.classList.remove('font-medium');
+                    span.classList.add('font-semibold');
+                }
+            }
+
+            const infoBtn = document.getElementById('info-toggle-btn');
+            if (infoBtn) {
+                if (tabId === 'about') {
+                    infoBtn.classList.remove('bg-[#f0f4f1]', 'text-[#227b54]');
+                    infoBtn.classList.add('bg-[#227b54]', 'text-white');
+                } else {
+                    infoBtn.classList.remove('bg-[#227b54]', 'text-white');
+                    infoBtn.classList.add('bg-[#f0f4f1]', 'text-[#227b54]');
+                }
+            }
+
+            const viewport = document.getElementById('main-viewport');
+            if (viewport) viewport.scrollTop = 0;
+        }
+
+        // Collapsible Privacy Details & Disclaimer Acknowledgement
+        let isPrivacyExpanded = true;
+
+        function togglePrivacyDetails() {
+            isPrivacyExpanded = !isPrivacyExpanded;
+            const body = document.getElementById('privacy-details-body');
+            const label = document.getElementById('privacy-toggle-label');
+            const icon = document.getElementById('privacy-toggle-icon');
+            if (!body || !label || !icon) return;
+
+            if (isPrivacyExpanded) {
+                body.classList.remove('hidden');
+                label.innerText = '收合';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                body.classList.add('hidden');
+                label.innerText = '展開';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function acknowledgeDisclaimer() {
+            const btn = document.getElementById('disclaimer-ack-btn');
+            const status = document.getElementById('disclaimer-ack-status');
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>已確認了解';
+                btn.classList.remove('bg-[#227b54]', 'hover:bg-[#1b6444]', 'text-white');
+                btn.classList.add('bg-[#e6f4ed]', 'text-[#227b54]', 'border', 'border-[#b8dbc7]');
+            }
+            if (status) {
+                status.innerHTML = '<i class="fa-solid fa-circle-check text-[#227b54]"></i> 已閱讀聲明，點 ⓘ 可返回';
+            }
+        }
+
+        // Modal Helper
+        function showModal(title, desc, isSuccess = true) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            const icon = document.getElementById('modal-icon');
+            if (isSuccess) {
+                icon.className = 'w-14 h-14 rounded-full bg-[#e6f4ed] text-[#227b54] flex items-center justify-center text-2xl mx-auto shadow-inner';
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                icon.className = 'w-14 h-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mx-auto shadow-inner';
+                icon.innerHTML = '<i class="fa-solid fa-bell"></i>';
+            }
+            document.getElementById('modal-box').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-box').classList.add('hidden');
+        }
+
+        // Compute total calories
+        function getTotalKcal() {
+            return appState.meals.breakfast + appState.meals.lunch + appState.meals.dinner + appState.meals.snack;
+        }
+
+        // Synchronize Home & Diary UI with State
+        function refreshDashboardUI() {
+            const totalKcal = getTotalKcal();
+            const remaining = Math.max(0, appState.targetKcal - totalKcal);
+            const pct = Math.min(100, Math.round((totalKcal / appState.targetKcal) * 100));
+
+            document.getElementById('home-total-kcal').innerText = totalKcal.toLocaleString();
+            document.getElementById('home-target-kcal').innerText = appState.targetKcal.toLocaleString();
+            document.getElementById('home-progress-pct').innerText = pct;
+            document.getElementById('home-remaining-kcal').innerText = remaining.toLocaleString();
+            document.getElementById('home-progress-bar').style.width = `${pct}%`;
+
+            document.getElementById('meal-breakfast-kcal').innerText = appState.meals.breakfast;
+            document.getElementById('meal-lunch-kcal').innerText = appState.meals.lunch;
+            document.getElementById('meal-dinner-kcal').innerText = appState.meals.dinner;
+            document.getElementById('meal-snack-kcal').innerText = appState.meals.snack;
+
+            document.getElementById('home-coins-count').innerText = appState.coins.toLocaleString();
+            document.getElementById('home-buddy-exp').innerText = appState.buddyExp;
+            document.getElementById('buddy-streak').innerText = appState.buddyStreak;
+
+            const levelEl = document.getElementById('home-buddy-level');
+            if (appState.buddyExp >= 300) {
+                levelEl.innerHTML = '<i class="fa-solid fa-crown text-amber-300 mr-1"></i>Lv.4 衡好守護獸';
+            } else {
+                levelEl.innerHTML = '<i class="fa-solid fa-shield-heart text-amber-300 mr-1"></i>Lv.3 衡好萌獸';
+            }
+
+            const badgeStatus = document.getElementById('badge-nutrition-status');
+            const badgeCard = document.getElementById('badge-nutrition');
+            if (appState.nutritionCount >= 5) {
+                badgeStatus.innerText = '已解鎖';
+                badgeStatus.className = 'text-[9px] text-[#227b54] font-semibold mt-1';
+                badgeCard.classList.remove('opacity-75');
+                badgeCard.classList.add('border-[#227b54]/30');
+            } else {
+                badgeStatus.innerText = `進行中 (${appState.nutritionCount}/5)`;
+            }
+        }
+
+        // Append new entry to Diary log list
+        function prependDiaryLog(title, meta) {
+            const container = document.getElementById('log-items-container');
+            if (!container) return;
+            const newItem = document.createElement('div');
+            newItem.className = 'bg-[#f0f4f1] p-3.5 rounded-2xl flex items-center justify-between border border-[#227b54]/30 gap-2 animate-fade-up';
+            newItem.innerHTML = `
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-[#227b54]/15 text-[#227b54] flex items-center justify-center font-bold text-sm shrink-0">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="text-xs font-bold text-[#1b3026] truncate">${title}</h4>
+                        <span class="text-[10px] text-[#5c7a6b]">${meta}</span>
+                    </div>
+                </div>
+                <span class="text-xs bg-[#e6f4ed] text-[#227b54] px-2 py-1 rounded-lg font-semibold shrink-0">AI 已解析</span>
+            `;
+            container.prepend(newItem);
+        }
+
+        // Apply analyzed meal to state and UI
+        function applyRecognizedMeal(mealName, mealCategoryKey, mealCategoryLabel, kcal, macroText) {
+            appState.meals[mealCategoryKey] += kcal;
+            appState.coins += 20;
+            appState.buddyExp = Math.min(300, appState.buddyExp + 50);
+            appState.nutritionCount = Math.min(5, appState.nutritionCount + 1);
+
+            refreshDashboardUI();
+            prependDiaryLog(`${mealCategoryLabel}：${mealName}`, `剛剛 · ${kcal} kcal · ${macroText}`);
+            showModal(
+                '餵食與辨識成功！',
+                `AI 成功辨識「${mealName}」(${kcal} kcal)。Buddy 經驗值 +50，並獲得 20 衡好幣！`
+            );
+        }
+
+        // Food Photo Upload Handler
+        function handleFoodPhoto(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            showModal('AI 營養辨識中...', `正在分析「${file.name}」的熱量與營養素組成，請稍候...`);
+            setTimeout(() => {
+                closeModal();
+                applyRecognizedMeal('日式烤鮭魚定食', 'dinner', '晚餐', 520, '蛋白質 38g');
+            }, 1100);
+            event.target.value = '';
+        }
+
+        // Quick sample meal button for instant testing on any device
+        const sampleMeals = [
+            { name: '日式烤鮭魚定食', key: 'dinner', label: '晚餐', kcal: 520, macro: '蛋白質 38g' },
+            { name: '舒肥雞胸藜麥沙拉碗', key: 'dinner', label: '晚餐', kcal: 410, macro: '膳食纖維 9g' },
+            { name: '無糖拿鐵與全麥吐司', key: 'snack', label: '點心', kcal: 210, macro: '鈣質與碳水平衡' }
+        ];
+        let sampleMealIndex = 0;
+
+        function simulateSampleMeal() {
+            const sample = sampleMeals[sampleMealIndex % sampleMeals.length];
+            sampleMealIndex += 1;
+            applyRecognizedMeal(sample.name, sample.key, sample.label, sample.kcal, sample.macro);
+        }
+
+        // Buddy Interactive Feedback
+        const buddyQuotes = [
+            { mood: '心情：超開心', quote: '謝謝你陪我一起維持健康習慣！💚', emoji: '🐸💚' },
+            { mood: '心情：充滿活力', quote: '今天的步數與飲食紀錄都很棒喔！✨', emoji: '🐸✨' },
+            { mood: '心情：被療癒了', quote: '記得適時喝水與深呼吸放鬆一下～🌿', emoji: '🐸🌿' }
+        ];
+        let buddyQuoteIdx = 0;
+
+        function interactWithBuddy() {
+            const item = buddyQuotes[buddyQuoteIdx % buddyQuotes.length];
+            buddyQuoteIdx += 1;
+            document.getElementById('buddy-mood').innerText = item.mood;
+            document.getElementById('buddy-quote').innerText = item.quote;
+            document.getElementById('buddy-emoji').innerText = item.emoji;
+            appState.buddyExp = Math.min(300, appState.buddyExp + 10);
+            refreshDashboardUI();
+        }
+
+        // Alarm Rendering & Management
+        function renderAlarms() {
+            const container = document.getElementById('alarm-list');
+            if (!container) return;
+
+            const displayedAlarms = appState.alarms.slice(0, 6);
+            container.innerHTML = displayedAlarms.map(alarm => `
+                <button
+                    type="button"
+                    onclick="toggleAlarm(${alarm.id})"
+                    class="bg-white/85 hover:bg-white rounded-xl p-2 text-center transition border ${alarm.enabled ? 'border-blue-200' : 'border-slate-200 opacity-65'}">
+                    <div class="text-[10px] text-blue-800 truncate">${alarm.label}</div>
+                    <div class="font-bold text-sm text-blue-950">${alarm.time}</div>
+                    <div class="text-[9px] font-semibold ${alarm.enabled ? 'text-emerald-700' : 'text-slate-500'}">
+                        ${alarm.enabled ? '已開啟' : '已關閉'}
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function toggleAlarm(id) {
+            const target = appState.alarms.find(a => a.id === id);
+            if (!target) return;
+            target.enabled = !target.enabled;
+            renderAlarms();
+        }
+
+        function openAddAlarmModal() {
+            document.getElementById('alarm-label-input').value = '';
+            document.getElementById('alarm-time-input').value = '16:00';
+            document.getElementById('alarm-modal').classList.remove('hidden');
+        }
+
+        function closeAlarmModal() {
+            document.getElementById('alarm-modal').classList.add('hidden');
+        }
+
+        function saveCustomAlarm() {
+            const labelInput = document.getElementById('alarm-label-input').value.trim();
+            const timeInput = document.getElementById('alarm-time-input').value || '16:00';
+            const label = labelInput || '健康提醒';
+
+            appState.alarms.push({
+                id: Date.now(),
+                label,
+                time: timeInput,
+                enabled: true
+            });
+
+            renderAlarms();
+            closeAlarmModal();
+            showModal('健康鬧鐘已新增', `已設定每日 ${timeInput}「${label}」推播提醒，Buddy 會準時陪伴您！`, false);
+        }
+
+        // Rewards & Coins Actions
+        function showRewardDetail(type) {
+            if (type === 'insurance') {
+                showModal(
+                    '保費折抵資訊',
+                    `您目前累積 ${appState.coins} 衡好幣。完成每週健康任務與步數目標，可於國泰健康合作方案中查詢保費折抵與健康回饋規則。`
+                );
+            } else {
+                showModal(
+                    '健檢折價券',
+                    '憑衡好幣可於國泰健康管理旗下健檢中心與診所預約健檢時折抵指定項目費用，打造從健檢到日常的完整照護。'
+                );
+            }
+        }
+
+        function redeemCoins() {
+            showModal(
+                '衡好幣兌換專區',
+                `您目前擁有 ${appState.coins} 衡好幣！可兌換健檢折價券、健康生活好禮或解鎖進階 AI 營養分析服務。`
+            );
+        }
+
+        // Wearable Device Scan & Resync
+        function connectWearableDevice() {
+            const hrDelta = Math.floor(Math.random() * 5) - 2;
+            const stepAdd = Math.floor(Math.random() * 180) + 60;
+            appState.wearable.hr = Math.max(58, Math.min(96, appState.wearable.hr + hrDelta));
+            appState.wearable.steps += stepAdd;
+            appState.wearable.connected = true;
+
+            document.getElementById('wearable-hr').innerHTML = `${appState.wearable.hr} <span class="text-[9px] font-normal">bpm</span>`;
+            document.getElementById('wearable-spo2').innerText = `${appState.wearable.spo2}%`;
+            document.getElementById('wearable-steps').innerText = appState.wearable.steps.toLocaleString();
+            document.getElementById('wearable-status-badge').innerHTML = '<i class="fa-solid fa-circle text-[7px] mr-1"></i>已連線';
+
+            showModal(
+                '智慧穿戴裝置已同步',
+                `已完成藍牙數據同步！目前心跳 ${appState.wearable.hr} bpm、血氧 ${appState.wearable.spo2}%、步數 ${appState.wearable.steps.toLocaleString()} 步。`
+            );
+        }
+
+        // Emergency SOS Demo Modal
+        function triggerEmergencySOS(number) {
+            showModal(
+                'SOS 示範按鈕',
+                `你選擇了 ${number}。目前這是介面展示原型，尚未連接實際電話撥號、GPS 定位或緊急聯絡人通報；若有緊急情況，請直接使用手機撥打 ${number}。`,
+                false
+            );
+        }
+
+        // Social Check-In Sharing with Clipboard Fallback
+        function shareCheckIn() {
+            const shareText = '我在衡好 Buddy 獲得了 95 分的健康成績，你也快來試試國泰健康管理 AI 寵物養成吧！';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showModal(
+                        '打卡分享成功！',
+                        '已將「我在衡好 Buddy 獲得了 95 分的健康成績」複製到剪貼簿，您可以直接貼到 LINE、Instagram 或 Facebook 分享給好友！'
+                    );
+                }).catch(() => {
+                    copyFallbackText(shareText);
+                });
+            } else {
+                copyFallbackText(shareText);
+            }
+        }
+
+        function copyFallbackText(text) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showModal('打卡分享成功！', `已複製分享文字：${text}`);
+            } catch (e) {
+                showModal('打卡分享成功！', text);
+            }
+        }
+
+        // Simulated Voice Input Toggle
+        let isRecording = false;
+        let voiceTimeout = null;
+
+        function toggleVoiceInput() {
+            const micIcon = document.getElementById('mic-icon');
+            const input = document.getElementById('chat-input');
+            const btn = document.getElementById('voice-btn');
+
+            if (!isRecording) {
+                isRecording = true;
+                micIcon.className = 'fa-solid fa-microphone-slash text-xs text-rose-600 animate-pulse';
+                btn.classList.add('bg-rose-100');
+                input.placeholder = '正在聆聽您的語音提問...';
+
+                voiceTimeout = setTimeout(() => {
+                    if (isRecording) {
+                        input.value = '我最近血壓偏高，有什麼日常飲食建議嗎？';
+                        stopVoiceVisuals();
+                        sendChatMessage();
+                    }
+                }, 2000);
+            } else {
+                if (voiceTimeout) clearTimeout(voiceTimeout);
+                stopVoiceVisuals();
+            }
+        }
+
+        function stopVoiceVisuals() {
+            isRecording = false;
+            const micIcon = document.getElementById('mic-icon');
+            const input = document.getElementById('chat-input');
+            const btn = document.getElementById('voice-btn');
+            micIcon.className = 'fa-solid fa-microphone text-xs';
+            btn.classList.remove('bg-rose-100');
+            input.placeholder = '輸入或使用語音提問...';
+        }
+
+        // Escape HTML for safe chat bubble rendering
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // AI Chat Send & Response
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const rawText = input.value.trim();
+            if (!rawText) return;
+
+            const safeText = escapeHTML(rawText);
+            const chatContainer = document.getElementById('chat-messages');
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'flex items-start space-x-2 justify-end animate-fade-up';
+            userMsg.innerHTML = `
+                <div class="bg-[#227b54] text-white p-3.5 rounded-2xl rounded-tr-sm text-xs shadow-sm max-w-[82%] leading-relaxed">
+                    ${safeText}
+                </div>
+                <div class="w-7 h-7 rounded-full bg-[#1b3026] text-white flex items-center justify-center text-xs shrink-0 mt-1">我</div>
+            `;
+            chatContainer.appendChild(userMsg);
+            input.value = '';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            let reply = '收到您的提問。建議搭配均衡飲食、充足水分與規律作息，若持續不適也歡迎至國泰健康管理各據點洽詢專業醫療團隊。';
+            if (rawText.includes('疲倦') || rawText.includes('睡眠')) {
+                reply = '白天容易疲倦常與睡眠品質、鐵質或維生素B群攝取不足有關。建議睡前 60 分鐘減少螢幕藍光，午餐可增加優質蛋白質與深綠色蔬菜。';
+            } else if (rawText.includes('健檢') || rawText.includes('膽固醇')) {
+                reply = '解讀健檢報告時，建議將「低密度脂蛋白膽固醇（LDL）」與「三酸甘油酯」搭配生活型態一起看，並追蹤年度變化趨勢，必要時由醫師或營養師提供個別化調整。';
+            } else if (rawText.includes('晚餐') || rawText.includes('吃什麼')) {
+                reply = `您今日已攝取 ${getTotalKcal().toLocaleString()} kcal，建議晚餐選擇清蒸魚或豆腐、大量蔬菜與半碗全穀雜糧，清爽無負擔。`;
+            } else if (rawText.includes('血壓')) {
+                reply = '維持低鈉飲食、多攝取高鉀蔬果（如菠菜、香蕉、番茄）並進行每週規律有氧運動與呼吸放鬆，有助於日常血壓管理。';
+            }
+
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'flex items-start space-x-2 animate-fade-up';
+                aiMsg.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-[#227b54] text-white flex items-center justify-center text-xs shrink-0 mt-1">AI</div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-sm text-xs text-[#1b3026] shadow-sm border border-[#e2eae5] max-w-[82%] leading-relaxed">
+                        ${reply}
+                    </div>
+                `;
+                chatContainer.appendChild(aiMsg);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 650);
+        }
+
+        function sendPresetPrompt(promptText) {
+            const input = document.getElementById('chat-input');
+            input.value = promptText;
+            sendChatMessage();
+        }
+
+        function clearChat() {
+            const chatContainer = document.getElementById('chat-messages');
+            chatContainer.innerHTML = `
+                <div class="flex items-start space-x-2">
+                    <div class="w-7 h-7 rounded-full bg-[#227b54] text-white flex items-center justify-center text-xs shrink-0 mt-1">AI</div>
+                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-sm text-xs text-[#1b3026] shadow-sm border border-[#e2eae5] max-w-[82%] leading-relaxed">
+                        對話已重新開始。請問今天有什麼我可以幫忙的嗎？
+                    </div>
+                </div>
+            `;
+        }
+
+        // Breathing Companion Timer
+        let breathingInterval = null;
+
+        function toggleBreathing(start) {
+            const circle = document.getElementById('breathing-circle');
+            const text = document.getElementById('breathing-text');
+
+            if (!start) {
+                if (breathingInterval) {
+                    clearInterval(breathingInterval);
+                    breathingInterval = null;
+                }
+                circle.style.transform = 'scale(1)';
+                text.innerText = '點擊開始';
+                return;
+            }
+
+            let phase = 0; // 0: Inhale, 1: Hold, 2: Exhale
+            text.innerText = '吸氣 (Inhale)';
+            circle.style.transform = 'scale(1.25)';
+
+            if (breathingInterval) clearInterval(breathingInterval);
+            breathingInterval = setInterval(() => {
+                phase = (phase + 1) % 3;
+                if (phase === 0) {
+                    text.innerText = '吸氣 (Inhale)';
+                    circle.style.transform = 'scale(1.25)';
+                } else if (phase === 1) {
+                    text.innerText = '保持 (Hold)';
+                    circle.style.transform = 'scale(1.25)';
+                } else {
+                    text.innerText = '呼氣 (Exhale)';
+                    circle.style.transform = 'scale(1.0)';
+                }
+            }, 4000);
+        }
+
+        // Export Report Simulation
+        function exportData() {
+            showModal(
+                '報表匯出成功',
+                `已彙整今日總熱量 ${getTotalKcal().toLocaleString()} kcal 與健康日誌紀錄，產生專屬健康摘要報表，方便提供營養師或醫師參考。`
+            );
+        }
+
+        // Initialize UI on load
+        renderAlarms();
+        refreshDashboardUI();
+    </script>
+</body>
+</html>
